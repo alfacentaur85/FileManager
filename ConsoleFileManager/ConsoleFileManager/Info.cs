@@ -36,6 +36,7 @@ namespace ConsoleFileManager
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                Logs.log.Add(e.Message);
             }
             
         }
