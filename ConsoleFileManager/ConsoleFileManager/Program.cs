@@ -14,8 +14,11 @@ namespace ConsoleFileManager
             /*Info.GetInfo(@"");*/
 
             ActionWithFileDir.Copy(@"D:\2", @"d:\3");
-            ActionWithFileDir.Copy(@"D:\2", @"");
-
+            /*ActionWithFileDir.Copy(@"D:\2", @"");*/
+            /*ActionWithFileDir.Copy(@"d:\2\data\ОМС\RK05.xml", @"1111");*/
+            /*ActionWithFileDir.Copy(@"d:\2\data\ОМС\RK05", @"1111");*/
+            ActionWithFileDir.Del(@"d:\3");
+            ActionWithFileDir.Del(@"546546546");
         }
     }
 }

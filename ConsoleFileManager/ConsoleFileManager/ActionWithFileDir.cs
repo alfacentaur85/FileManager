@@ -28,7 +28,7 @@ namespace ConsoleFileManager
             
         }
 
-        static PathType checkPath(string path, SourceDestination sd)
+        static PathType checkPath(string path, SourceDestination sd = SourceDestination.SOURCE)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace ConsoleFileManager
                 {
                     if (sd == SourceDestination.SOURCE)
                     {
-                        throw new Exception(string.Concat("Incorrect File or Directory: {0}", path));
+                        throw new Exception(string.Concat("Error: File or Directory ", path, " does not exist"));
                     }
                     return PathType.UNDEFIND;
                 }
@@ -53,6 +53,7 @@ namespace ConsoleFileManager
             {
                 Console.WriteLine(e.Message);
                 Logs.log.Add(e.Message);
+                OperationResult.FAILED.ToString();
                 return PathType.UNDEFIND;
             }
         }
@@ -68,6 +69,7 @@ namespace ConsoleFileManager
             {
                 Console.WriteLine(e.Message);
                 Logs.log.Add(e.Message);
+                OperationResult.FAILED.ToString();
                 return false;
             }
         }
@@ -75,9 +77,9 @@ namespace ConsoleFileManager
         public static void Copy(string fromPath, string toPath)
         {
             PathType _fromPath = checkPath(fromPath, SourceDestination.SOURCE);
-            PathType _toPath = checkPath(toPath, SourceDestination.DESTINATION);
-            if (true)
+            if (_fromPath != PathType.UNDEFIND)
             {
+                PathType _toPath = checkPath(toPath, SourceDestination.DESTINATION);
                 if ( (_fromPath == PathType.DIRECTORY && CreateDir(toPath)) || (_toPath == PathType.DIRECTORY))
                 {
                     try
@@ -89,6 +91,7 @@ namespace ConsoleFileManager
                     {
                         Console.WriteLine(e.Message);
                         Logs.log.Add(e.Message);
+                        OperationResult.FAILED.ToString();
                     }
                     
                 }
@@ -103,6 +106,7 @@ namespace ConsoleFileManager
                     {
                         Console.WriteLine(e.Message);
                         Logs.log.Add(e.Message);
+                        OperationResult.FAILED.ToString();
                     }
                 }
                 else
@@ -115,15 +119,44 @@ namespace ConsoleFileManager
                     {
                         Console.WriteLine(e.Message);
                         Logs.log.Add(e.Message);
+                        OperationResult.FAILED.ToString();
                     }
                     
                 }
             }
            
         }
-        public static bool Del(string path)
+        public static void Del(string path)
         {
-            return false;
+            PathType _fromPath = checkPath(path);
+            try
+            {
+                switch (_fromPath)
+                {
+                    case PathType.DIRECTORY:
+                    {
+                        Directory.Delete(path, true);
+                        break;
+                    }
+                    case PathType.FILE:
+                    {
+                        File.Delete(path);
+                        break;
+                    }
+                    default:
+                    {
+                        return;
+                    }
+                }
+                Console.WriteLine(OperationResult.SUCCESSFULY.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Logs.log.Add(e.Message);
+                OperationResult.FAILED.ToString();
+            }
+           
         }
     }
 }
