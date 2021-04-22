@@ -8,7 +8,7 @@ namespace ConsoleFileManager
     {
         static void Main(string[] args)
         {
-            /*FileStructure.ShowStructRootDirectory(new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory@"D:\2"));*/
+            FileStructure.ShowStructRootDirectory(new DirectoryInfo(/*AppDomain.CurrentDomain.BaseDirector*/@"D:\2"));
             Info.GetInfo(@"D:\2");
             
             /*Info.GetInfo(@"");*/

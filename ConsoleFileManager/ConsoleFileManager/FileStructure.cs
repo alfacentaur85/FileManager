@@ -8,33 +8,49 @@ namespace ConsoleFileManager
 {
     public static class FileStructure
     {
-        
-
-        
 
         const short incrementSpace = 2;
 
-        static int NestingLevel { get; set; }
+        static int _nestingLevel;
 
-        public static void ShowStructRootDirectory(System.IO.DirectoryInfo root)
+        static int _counterElementsPerPage;
+
+        static int countElementsPerPage = 6;
+
+        static bool flagRecursive = true;
+
+        static bool CheckCountCurrentElements(int countElementsPerPage)
         {
-            NestingLevel = 0;
-
-            Console.WriteLine("[{0}]", root.FullName);
-
-            WalkDirectoryTree(root);
-
+            if (countElementsPerPage <= _counterElementsPerPage)
+            {
+                Console.WriteLine("Please press any key to continue or ESC to abort...");
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.KeyChar != '\u001b')
+                {
+                    _counterElementsPerPage = 0;
+                    return true;
+                }
+                else
+                {
+                    flagRecursive = false;
+                    _counterElementsPerPage = countElementsPerPage;
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
         }
 
-        public static void WalkDirectoryTree(System.IO.DirectoryInfo root)
-        {   
 
+        static void WalkDirectoryTree(System.IO.DirectoryInfo root)
+        {
             //array of DirectoryInfo
             System.IO.DirectoryInfo[] subDirs = null;
 
             if (root != null)
             {
-
                 //array of FileInfo
                 System.IO.FileInfo[] files = null;
 
@@ -43,6 +59,7 @@ namespace ConsoleFileManager
                 {
                     files = root.GetFiles("*.*");
                 }
+
                 // This is thrown if even one of the files requires permissions greater
                 // than the application provides.
                 catch (UnauthorizedAccessException e)
@@ -58,7 +75,7 @@ namespace ConsoleFileManager
                     Console.WriteLine(e.Message);
                 }
 
-                
+
 
                 foreach (System.IO.FileInfo fi in files)
                 {
@@ -66,31 +83,64 @@ namespace ConsoleFileManager
                     // want to open, delete or modify the file, then
                     // a try-catch block is required here to handle the case
                     // where the file has been deleted since the call to TraverseTree(). 
-
-                    Console.WriteLine("{0}{1}", new String("").PadLeft(NestingLevel + incrementSpace, ' '), fi.Name);
+                    if (CheckCountCurrentElements(countElementsPerPage))
+                    {
+                        _counterElementsPerPage++;
+                        Console.WriteLine("{0}{1}", new String("").PadLeft(_nestingLevel + incrementSpace, ' '), fi.Name);
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
 
                 // Now find all the subdirectories under this directory.
                 subDirs = root.GetDirectories();
-
+                 
                 if (subDirs.Length != 0)
                 {
-                    NestingLevel += incrementSpace;
+                    _nestingLevel += incrementSpace;
                 }
 
                 foreach (System.IO.DirectoryInfo dirInfo in subDirs)
                 {
-                    Console.WriteLine("{0}[{1}]", new String("").PadLeft(NestingLevel, ' '), dirInfo.Name);
+                    if (flagRecursive)
+                    {
+                        if (CheckCountCurrentElements(countElementsPerPage))
+                        {
+                            _counterElementsPerPage++;
+                            Console.WriteLine("{0}[{1}]", new String("").PadLeft(_nestingLevel, ' '), dirInfo.Name);
+                            // Resursive call for each subdirectory.
+                            WalkDirectoryTree(dirInfo);
 
-                    // Resursive call for each subdirectory.
-                    WalkDirectoryTree(dirInfo);
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
 
-                    
                 }
-                
             }
+
         }
 
 
-    }
+
+        public static void ShowStructRootDirectory(System.IO.DirectoryInfo root)
+        {
+            _nestingLevel = 0;
+
+            _counterElementsPerPage = 1;
+
+            Console.WriteLine("[{0}]", root.FullName);
+
+            WalkDirectoryTree(root);
+
+        }
+    }  
 }
